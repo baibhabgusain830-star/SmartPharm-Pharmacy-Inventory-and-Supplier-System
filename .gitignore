@@ -1,0 +1,19 @@
+# Compiled executables and object files
+*.exe
+*.o
+*.obj
+*.dll
+*.so
+*.dylib
+
+# Temporary and editor files
+.vscode/
+.vs/
+*.swp
+*~
+*.bak
+
+# Runtime and audit logs
+audit.log
+*.tmp
+temp_bare.git/
