@@ -1,2 +1,0 @@
-SUP01|Cipla Distributing|+91-9876543210|supply@cipla.com
-SUP02|Sun Pharma Logistics|+91-9123456780|orders@sunpharma.com

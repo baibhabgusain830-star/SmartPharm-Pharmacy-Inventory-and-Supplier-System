@@ -1,4 +1,0 @@
-MED101|Paracetamol 500mg|89010101|Analgesic|15.5
-MED102|Amoxicillin 250mg|89020202|Antibiotic|45
-MED103|Cetirizine 10mg|89030303|Antihistamine|8
-MED104|Azithromycin 500mg|89040404|Antibiotic|75
