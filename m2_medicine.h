@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include <fstream>
 using namespace std;
 
 class Medicine {
@@ -13,6 +14,8 @@ public:
     string category;
     double price;
     int stock;
+    string medType;
+    int extraVal;
 
     Medicine(int i = 0, string b = "", string n = "", string c = "", double p = 0.0, int s = 0) {
         id = i;
@@ -21,11 +24,15 @@ public:
         category = c;
         price = p;
         stock = s;
+        medType = "GENERIC";
+        extraVal = 0;
     }
 
+    virtual ~Medicine() {}
+
     virtual void display() {
-        cout << "[" << id << " | Barcode: " << barcode << "] " << name 
-             << " | Cat: " << category << " | $" << price << " | Stock: " << stock;
+        cout << "[" << id << " | Barcode: " << barcode << "] " << name
+             << " | Cat: " << category << " | Rs." << price << " | Total Stock: " << stock;
     }
 };
 
@@ -35,13 +42,46 @@ public:
     Tablet(int i, string b, string n, string c, double p, int s, int m)
         : Medicine(i, b, n, c, p, s) {
         mg = m;
+        medType = "TABLET";
+        extraVal = m;
     }
 
     void display() override {
         Medicine::display();
-        cout << " | Dosage: " << mg << "mg" << endl;
+        cout << " | Type: Tablet (" << mg << "mg)" << endl;
     }
 };
+
+class Syrup : public Medicine {
+public:
+    int ml;
+    Syrup(int i, string b, string n, string c, double p, int s, int v)
+        : Medicine(i, b, n, c, p, s) {
+        ml = v;
+        medType = "SYRUP";
+        extraVal = v;
+    }
+
+    void display() override {
+        Medicine::display();
+        cout << " | Type: Syrup (" << ml << "ml)" << endl;
+    }
+};
+
+class Injection : public Medicine {
+public:
+    Injection(int i, string b, string n, string c, double p, int s)
+        : Medicine(i, b, n, c, p, s) {
+        medType = "INJECTION";
+        extraVal = 0;
+    }
+
+    void display() override {
+        Medicine::display();
+        cout << " | Type: Injection" << endl;
+    }
+};
+
 struct HashNode {
     Medicine* med;
     HashNode* next;
@@ -52,15 +92,15 @@ struct HashNode {
 };
 
 class HashTable {
-private:
-    static const int SIZE = 10;
+public:
+    static const int SIZE = 1009;
     HashNode* table[SIZE];
 
     int hashFunction(int key) {
+        if (key < 0) key = -key;
         return key % SIZE;
     }
 
-public:
     HashTable() {
         for (int i = 0; i < SIZE; i++) table[i] = nullptr;
     }
@@ -91,6 +131,84 @@ public:
             }
         }
         return nullptr;
+    }
+
+    void displayAll() {
+        int count = 0;
+        for (int i = 0; i < SIZE; i++) {
+            HashNode* temp = table[i];
+            while (temp != nullptr) {
+                temp->med->display();
+                count++;
+                temp = temp->next;
+            }
+        }
+        if (count == 0) cout << "No medicines in inventory." << endl;
+        else cout << "Total Medicines Displayed: " << count << endl;
+    }
+
+    void saveMedicinesCSV() {
+        ofstream fout("medicines.csv");
+        for (int i = 0; i < SIZE; i++) {
+            HashNode* temp = table[i];
+            while (temp != nullptr) {
+                Medicine* m = temp->med;
+                fout << m->medType << " " << m->id << " " << m->barcode << " "
+                     << m->name << " " << m->category << " " << m->price << " "
+                     << m->stock << " " << m->extraVal << endl;
+                temp = temp->next;
+            }
+        }
+        fout.close();
+    }
+};
+
+struct BSTNode {
+    Medicine* med;
+    BSTNode* left;
+    BSTNode* right;
+    BSTNode(Medicine* m) {
+        med = m;
+        left = nullptr;
+        right = nullptr;
+    }
+};
+
+class CategoryBST {
+public:
+    BSTNode* root;
+
+    CategoryBST() {
+        root = nullptr;
+    }
+
+    BSTNode* insertRec(BSTNode* node, Medicine* m) {
+        if (node == nullptr) return new BSTNode(m);
+        if (m->category < node->med->category)
+            node->left = insertRec(node->left, m);
+        else
+            node->right = insertRec(node->right, m);
+        return node;
+    }
+
+    void insert(Medicine* m) {
+        root = insertRec(root, m);
+    }
+
+    void inOrder(BSTNode* node) {
+        if (node == nullptr) return;
+        inOrder(node->left);
+        node->med->display();
+        inOrder(node->right);
+    }
+
+    void displayOrderedByCategory() {
+        if (root == nullptr) {
+            cout << "No medicines in BST." << endl;
+            return;
+        }
+        cout << "\n--- Medicines Ordered by Category (BST In-Order) ---" << endl;
+        inOrder(root);
     }
 };
 
